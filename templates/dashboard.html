@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Monitoring Project</title>
+</head>
+<body class="bg-gray-50 p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Board Monitoring Proyek</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Kolom TODO -->
+            <div class="bg-gray-200 rounded-lg p-4">
+                <h2 class="font-bold text-gray-700 mb-4 flex justify-between">
+                    TO DO <span class="bg-gray-300 text-gray-700 px-2 rounded-full text-sm">Todo</span>
+                </h2>
+                {% for task in tasks if task.status == 'todo' %}
+                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-red-400">
+                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Kolom DOING -->
+            <div class="bg-gray-200 rounded-lg p-4">
+                <h2 class="font-bold text-gray-700 mb-4">DOING</h2>
+                {% for task in tasks if task.status == 'doing' %}
+                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-yellow-400">
+                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Kolom DONE -->
+            <div class="bg-gray-200 rounded-lg p-4">
+                <h2 class="font-bold text-gray-700 mb-4">DONE</h2>
+                {% for task in tasks if task.status == 'done' %}
+                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-green-400">
+                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
