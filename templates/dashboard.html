@@ -4,48 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Monitoring Project</title>
+    <title>Trello-Clone Monitoring | {{ tupoksi_user }} Team</title>
+    <style>
+        /* Trello specific colors/styles */
+        body { background-color: #0079BF; } /* Trello Blue */
+        .board-canvas {
+            height: calc(100vh - 48px); /* Full height minus header */
+        }
+        .list-container {
+            width: 272px; /* Fixed standard Trello list width */
+            flex-shrink: 0;
+        }
+        .trello-list {
+            background-color: #EBECF0; /* Standard light gray list bg */
+        }
+        .trello-card {
+            background-color: #ffffff;
+            transition: background-color 0.15s ease-in, transform 0.1s ease-out;
+        }
+        .trello-card:hover {
+            background-color: #F4F5F7;
+            transform: translateY(-2px);
+        }
+    </style>
+    <script>
+        // Tailwind configuration for custom classes
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                trello: {
+                  blue: '#0079BF',
+                  green: '#51A846',
+                  yellow: '#F2D600',
+                  red: '#EB5A46',
+                  purple: '#C377E0',
+                  orange: '#FFAB4A'
+                },
+                'task-label': {
+                  'desain': '#C377E0', // Purple
+                  'frontend': '#00C2E0', // Cyan
+                  'backend': '#FFAB4A', // Orange
+                  'marketing': '#51A846', // Green
+                  'qa': '#EB5A46' // Red
+                }
+              }
+            }
+          }
+        }
+      </script>
 </head>
-<body class="bg-gray-50 p-8 font-sans">
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Board Monitoring Proyek</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Kolom TODO -->
-            <div class="bg-gray-200 rounded-lg p-4">
-                <h2 class="font-bold text-gray-700 mb-4 flex justify-between">
-                    TO DO <span class="bg-gray-300 text-gray-700 px-2 rounded-full text-sm">Todo</span>
-                </h2>
-                {% for task in tasks if task.status == 'todo' %}
-                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-red-400">
-                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
-                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
-                </div>
-                {% endfor %}
-            </div>
+<body class="font-sans text-gray-800 antialiased">
 
-            <!-- Kolom DOING -->
-            <div class="bg-gray-200 rounded-lg p-4">
-                <h2 class="font-bold text-gray-700 mb-4">DOING</h2>
-                {% for task in tasks if task.status == 'doing' %}
-                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-yellow-400">
-                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
-                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Kolom DONE -->
-            <div class="bg-gray-200 rounded-lg p-4">
-                <h2 class="font-bold text-gray-700 mb-4">DONE</h2>
-                {% for task in tasks if task.status == 'done' %}
-                <div class="bg-white p-4 rounded shadow-sm mb-3 border-l-4 border-green-400">
-                    <p class="font-semibold text-gray-800">{{ task.title }}</p>
-                    <p class="text-xs text-gray-500 mt-2">Tupoksi: <span class="font-medium text-blue-600">{{ task.tupoksi }}</span></p>
-                </div>
-                {% endfor %}
+    <!-- Header (Trello Header Style) -->
+    <header class="h-12 bg-black bg-opacity-15 flex items_center px-4 justify-between border-b border-white/20">
+        <div class="flex items-center gap-2">
+            <svg class="h-5 w-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <h1 class="text-xl font-bold text-white/80 tracking-tight">Project Board</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-white/80">Hi, {{ tupoksi_user }} Team Member</span>
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border border-white/30">
+                <span class="font-bold text-white text-sm">JS</span>
             </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Board Canvas -->
+    <main class="board-canvas p-3 flex gap-3 overflow-x-auto items-start">
+
+        <!-- Function to Generate List/Column (to avoid code repetition) -->
+        {% macro render_list(title, status_key, header_color, tasks_list) %}
+        <div class="list-container trello-list rounded-lg shadow-md p-2 max-h-full flex flex-col">
+            <h2 class="font-bold text-gray-700 text-sm px-2 py-1 mb-2 border-b-2 {{ header_color }} flex justify-between items-center">
+                {{ title }}
+                <span class="text-xs font-normal text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
+                    {{ tasks_list | selectattr('status', 'equalto', status_key) | list | length }}
+                </span>
+            </h2>
+            
+            <div class="space-y-2 overflow-y-auto pr-1 flex-grow">
+                {% for task in tasks_list if task.status == status_key %}
+                <!-- THE TRELLO CARD -->
+                <div class="trello-card rounded shadow p-3 border border-gray-200 cursor-pointer relative group">
+                    
+                    <!-- Label Tupoksi -->
+                    <div class="w-12 h-2 rounded-full mb-2 bg-task-label-{{ task.tupoksi }}"></div>
+                    
+                    <p class="text-sm font-medium text-gray-800 leading-snug">{{ task.title }}</p>
+                    
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-xs text-gray-500 font-medium">Tupoksi: <span class="text-task-label-{{ task.tupoksi }} font-semibold">{{ task.tupoksi | capitalize }}</span></span>
+                        
+                        <!-- Simulated User Avatar -->
+                        <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center border border-white -mr-1 shadow-inner">
+                            <span class="font-bold text-gray-600 text-xxs">AN</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-6 text-gray-400 text-xs italic">Belum ada tugas</div>
+                {% endfor %}
+            </div>
+
+            <button class="mt-2 text-gray-600 text-sm font-medium flex items-center gap-1.5 p-1.5 hover:bg-gray-300/50 rounded w-full justify-start">
+                <span class="text-lg">+</span> Tambah kartu lain
+            </button>
+        </div>
+        {% endmacro %}
+
+        <!-- Render the 3 columns -->
+        {{ render_list('To Do', 'todo', 'border-task-label-backend', tasks) }}
+        {{ render_list('In Progress', 'doing', 'border-task-label-frontend', tasks) }}
+        {{ render_list('Done', 'done', 'border-task-label-marketing', tasks) }}
+
+    </main>
+
 </body>
 </html>
